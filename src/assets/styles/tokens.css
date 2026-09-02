@@ -1,0 +1,22 @@
+/* デザイントークン。色・余白・角丸・影はここでだけ定義し、各コンポーネントは var(--…) で参照する */
+:root {
+  --primary: #1976d2;
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --border: #e0e0e0;
+  --text: #212121;
+  --text-sub: #757575;
+  --danger: #d32f2f;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --elevation-2: 0 2px 6px rgba(0, 0, 0, 0.16);
+}

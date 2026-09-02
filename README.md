@@ -1,48 +1,70 @@
-# vue-template-2026
+# Kadai_Students（提出課題③ 児童生徒 検索アプリ）
 
-This template should help get you started developing with Vue 3 in Vite.
+学校・学年・組・氏名・要フォローの条件で児童生徒を絞り込んで探すアプリ。
+APIは使わず、データは `src/data/students.ts` の配列（架空データ40件）を使う。
 
-## Recommended IDE Setup
+## 技術スタック
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+| 種別 | 使用技術 |
+| --- | --- |
+| フレームワーク | Vue 3（Composition API / `<script setup>`） |
+| 言語 | TypeScript |
+| ビルド | Vite |
+| ルーティング | Vue Router |
+| 静的解析 | ESLint / oxlint / Prettier |
+| Node | 24.20.0（`.node-version` / `.nvmrc` で固定） |
+| 公開 | GitHub Pages（main へのマージで GitHub Actions が自動デプロイ） |
 
-## Recommended Browser Setup
+## セットアップ
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-yarn
+```bash
+nvm use        # .nvmrc の 24.20.0 に切り替える
+yarn install
 ```
 
-### Compile and Hot-Reload for Development
+## 開発コマンド
 
-```sh
-yarn dev
+| コマンド | 内容 |
+| --- | --- |
+| `yarn dev` | 開発サーバーを起動する |
+| `yarn build` | 本番ビルド（型チェック込み） |
+| `yarn preview` | ビルド結果をローカルで確認する |
+| `yarn type-check` | 型チェックのみ |
+| `yarn lint` | ESLint + oxlint |
+| `yarn format` | Prettier で整形する |
+
+## リポジトリ構成
+
+```
+.github/workflows/deploy.yml  main へのpushでビルドしGitHub Pagesへ公開
+src/
+  assets/styles/tokens.css    デザイントークン（色・余白・角丸・影）
+  assets/main.css             トークンの読み込みと最小限のベーススタイル
+  components/                 コンポーネント
+  data/masters.ts             学校・学年・クラスのマスタ（絞り込みの選択肢）
+  data/students.ts            児童生徒データ（架空・40件）
+  router/index.ts             ルーティング
+  views/                      ページ
 ```
 
-### Type-Check, Compile and Minify for Production
+## スタイルの決まり
 
-```sh
-yarn build
-```
+- 色・余白・角丸・影は `src/assets/styles/tokens.css` のCSS変数を `var(--…)` で参照する。値を直書きしない
+- コンポーネントのスタイルは `<style scoped>` に閉じる
 
-### Lint with [ESLint](https://eslint.org/)
+## 公開フロー
 
-```sh
-yarn lint
-```
+main にマージされると `.github/workflows/deploy.yml` が動き、ビルド結果が GitHub Pages に公開される。
+サブパス配信のため `vite.config.ts` でビルド時のみ `base` を設定し、直リンクで404にならないよう `404.html` を生成している。
+
+## 機能概要
+
+<!-- TODO: 何ができるアプリか、画面と操作を書く -->
+
+## 工夫した点
+
+<!-- TODO: 設計上の判断や、なぜその書き方にしたかを書く -->
+
+## 詰まった点・調べたこと
+
+<!-- TODO: つまずいた箇所と、どう調べて解決したかを書く -->
