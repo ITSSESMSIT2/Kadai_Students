@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StudentFilter from '@/components/StudentFilter.vue'
 import StudentList from '@/components/StudentList.vue'
 import { getStudents } from '@/api/studentApi'
 
@@ -7,7 +8,7 @@ const students = getStudents()
 
 <template>
   <section class="page">
-    <!-- PR2: 絞り込み条件（StudentFilter）をここに置く -->
+    <StudentFilter />
 
     <div class="card">
       <div class="card-header">

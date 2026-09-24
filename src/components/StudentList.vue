@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Student } from '@/data/students'
+import type { Student } from '@/types/student'
 import StudentRow from '@/components/StudentRow.vue'
 
 defineProps<{ students: Student[] }>()

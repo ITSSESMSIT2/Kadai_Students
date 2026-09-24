@@ -1,22 +1,4 @@
-import type { CodeName } from './masters'
-
-/** 児童生徒。学校・学年・クラスは { id, name } のオブジェクトで持つ */
-export interface Student {
-  /** ログインID。名.姓のローマ字（例 hina.sato）。一覧の先頭列に出し、v-for の :key にも使う */
-  id: string
-  name: string
-  /** ふりがな。未登録のレコードがある（空文字） */
-  kana: string
-  school: CodeName
-  grade: CodeName
-  /** 未所属のレコードがある（null） */
-  class: CodeName | null
-  attendanceNumber: number
-  /** 要フォロー */
-  needsFollow: boolean
-  /** ISO文字列。表示するときは日付だけに整形する */
-  updatedAt: string
-}
+import type { Student } from '@/types/student'
 
 /** すべて架空のデータ（実在の人物・学校とは関係ありません） */
 export const students: Student[] = [
