@@ -2,8 +2,16 @@
 import { getSchools } from '@/api/schoolApi'
 import { CLASSES } from '@/constants/classes'
 import { GRADES } from '@/constants/grades'
+import { SORT_KEYS, type SortKey, type SortOrder } from '@/constants/sort'
 
 const schools = getSchools()
+
+const sortKey = defineModel<SortKey>('sortKey', { required: true })
+const sortOrder = defineModel<SortOrder>('sortOrder', { required: true })
+
+const toggleOrder = () => {
+  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+}
 </script>
 
 <template>
@@ -56,13 +64,15 @@ const schools = getSchools()
 
       <div class="tools">
         <label for="filter-sort">並び替え</label>
-        <select id="filter-sort">
-          <option value="kana">ふりがな</option>
-          <option value="grade">学年</option>
-          <option value="updatedAt">更新日</option>
+        <select id="filter-sort" v-model="sortKey">
+          <option v-for="key in SORT_KEYS" :key="key.value" :value="key.value">
+            {{ key.label }}
+          </option>
         </select>
 
-        <button class="order" type="button">昇順 ↑</button>
+        <button class="order" type="button" @click="toggleOrder">
+          {{ sortOrder === 'asc' ? '昇順 ↑' : '降順 ↓' }}
+        </button>
         <button class="clear" type="button">条件クリア</button>
       </div>
     </div>
