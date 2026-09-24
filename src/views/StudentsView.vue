@@ -4,12 +4,45 @@ import StudentFilter from '@/components/StudentFilter.vue'
 import StudentList from '@/components/StudentList.vue'
 import { getStudents } from '@/api/studentApi'
 import type { SortKey, SortOrder } from '@/constants/sort'
+import type { StudentFilters } from '@/types/filter'
 import type { Student } from '@/types/student'
 
 const students = getStudents()
 
+/** 絞り込み条件の初期値。条件クリアでもこれに戻す */
+const emptyFilters = (): StudentFilters => ({
+  schoolIds: [],
+  gradeId: null,
+  classId: null,
+  keyword: '',
+  needsFollowOnly: false,
+})
+
+const filters = ref<StudentFilters>(emptyFilters())
 const sortKey = ref<SortKey>('kana')
 const sortOrder = ref<SortOrder>('asc')
+
+/** 氏名・ふりがなの部分一致。前後の空白と大文字小文字は無視する */
+const matchesKeyword = (student: Student, keyword: string): boolean => {
+  const needle = keyword.trim().toLowerCase()
+  return student.name.toLowerCase().includes(needle) || student.kana.toLowerCase().includes(needle)
+}
+
+/**
+ * 絞り込んだ一覧。条件どうしはANDで、学校の複数選択だけ選んだ中でORになる。
+ * 未選択・未入力・OFFの条件は絞り込みに使わない。
+ */
+const filteredStudents = computed(() =>
+  students.filter((student) => {
+    const { schoolIds, gradeId, classId, keyword, needsFollowOnly } = filters.value
+    if (schoolIds.length > 0 && !schoolIds.includes(student.school.id)) return false
+    if (gradeId !== null && student.grade.id !== gradeId) return false
+    if (classId !== null && student.class?.id !== classId) return false
+    if (needsFollowOnly && !student.needsFollow) return false
+    if (keyword.trim() !== '' && !matchesKeyword(student, keyword)) return false
+    return true
+  }),
+)
 
 /** 選択された並び替えキーでの比較。昇順のときに a を先へ置くなら負の数を返す */
 const compareBySortKey = (a: Student, b: Student, key: SortKey): number => {
@@ -49,12 +82,12 @@ const compareByRoster = (a: Student, b: Student): number =>
   a.id.localeCompare(b.id)
 
 /**
- * 並び替えた一覧。元の配列は書き換えずコピーしてから sort する。
+ * 絞り込んだ結果を並び替えた一覧。元の配列は書き換えずコピーしてから sort する。
  * 降順にするのは並び替えキーだけで、同値のときの並びは向きを変えていない。
  */
 const sortedStudents = computed(() => {
   const direction = sortOrder.value === 'asc' ? 1 : -1
-  return [...students].sort(
+  return [...filteredStudents.value].sort(
     (a, b) =>
       compareMissingKana(a, b, sortKey.value) ||
       compareBySortKey(a, b, sortKey.value) * direction ||
@@ -65,15 +98,21 @@ const sortedStudents = computed(() => {
 
 <template>
   <section class="page">
-    <StudentFilter v-model:sort-key="sortKey" v-model:sort-order="sortOrder" />
+    <StudentFilter
+      v-model="filters"
+      v-model:sort-key="sortKey"
+      v-model:sort-order="sortOrder"
+      @clear="filters = emptyFilters()"
+    />
 
     <div class="card">
       <div class="card-header">
         <h2 class="card-title">児童生徒一覧</h2>
-        <p class="count">全 {{ students.length }} 件</p>
+        <p class="count">該当 {{ filteredStudents.length }} 件 ・ 全 {{ students.length }} 件</p>
       </div>
 
-      <StudentList :students="sortedStudents" />
+      <StudentList v-if="sortedStudents.length > 0" :students="sortedStudents" />
+      <p v-else class="empty">該当する児童生徒がいません。条件を変更してください。</p>
     </div>
   </section>
 </template>
@@ -108,5 +147,12 @@ const sortedStudents = computed(() => {
   margin: 0;
   color: var(--text-sub);
   font-size: 12px;
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-xl);
+  color: var(--text-sub);
+  text-align: center;
 }
 </style>

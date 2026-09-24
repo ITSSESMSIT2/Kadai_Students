@@ -3,11 +3,15 @@ import { getSchools } from '@/api/schoolApi'
 import { CLASSES } from '@/constants/classes'
 import { GRADES } from '@/constants/grades'
 import { SORT_KEYS, type SortKey, type SortOrder } from '@/constants/sort'
+import type { StudentFilters } from '@/types/filter'
 
 const schools = getSchools()
 
+const filters = defineModel<StudentFilters>({ required: true })
 const sortKey = defineModel<SortKey>('sortKey', { required: true })
 const sortOrder = defineModel<SortOrder>('sortOrder', { required: true })
+
+const emit = defineEmits<{ clear: [] }>()
 
 const toggleOrder = () => {
   sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
@@ -22,7 +26,7 @@ const toggleOrder = () => {
       <legend>学校（複数選択）</legend>
       <div class="checks">
         <label v-for="school in schools" :key="school.id" class="check">
-          <input type="checkbox" :value="school.id" />
+          <input v-model="filters.schoolIds" type="checkbox" :value="school.id" />
           {{ school.name }}
         </label>
       </div>
@@ -31,8 +35,8 @@ const toggleOrder = () => {
     <div class="fields">
       <div class="field">
         <label for="filter-grade">学年</label>
-        <select id="filter-grade">
-          <option value="">すべて</option>
+        <select id="filter-grade" v-model="filters.gradeId">
+          <option :value="null">すべて</option>
           <option v-for="grade in GRADES" :key="grade.id" :value="grade.id">
             {{ grade.name }}
           </option>
@@ -41,8 +45,8 @@ const toggleOrder = () => {
 
       <div class="field">
         <label for="filter-class">組</label>
-        <select id="filter-class">
-          <option value="">すべて</option>
+        <select id="filter-class" v-model="filters.classId">
+          <option :value="null">すべて</option>
           <option v-for="classRoom in CLASSES" :key="classRoom.id" :value="classRoom.id">
             {{ classRoom.name }}
           </option>
@@ -51,13 +55,18 @@ const toggleOrder = () => {
 
       <div class="field field-keyword">
         <label for="filter-keyword">フリーワード</label>
-        <input id="filter-keyword" type="search" placeholder="氏名・ふりがなで検索" />
+        <input
+          id="filter-keyword"
+          v-model="filters.keyword"
+          type="search"
+          placeholder="氏名・ふりがなで検索"
+        />
       </div>
     </div>
 
     <div class="actions">
       <label class="toggle">
-        <input type="checkbox" />
+        <input v-model="filters.needsFollowOnly" type="checkbox" />
         <span class="track"></span>
         要フォローのみ表示
       </label>
@@ -73,7 +82,7 @@ const toggleOrder = () => {
         <button class="order" type="button" @click="toggleOrder">
           {{ sortOrder === 'asc' ? '昇順 ↑' : '降順 ↓' }}
         </button>
-        <button class="clear" type="button">条件クリア</button>
+        <button class="clear" type="button" @click="emit('clear')">絞り込みをクリア</button>
       </div>
     </div>
   </div>
