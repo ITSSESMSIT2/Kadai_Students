@@ -36,16 +36,27 @@ yarn install
 ## リポジトリ構成
 
 ```
-.github/workflows/deploy.yml  main へのpushでビルドしGitHub Pagesへ公開
+.github/workflows/deploy.yml   main へのpushでビルドしGitHub Pagesへ公開
 src/
-  assets/styles/tokens.css    デザイントークン（色・余白・角丸・影）
-  assets/main.css             トークンの読み込みと最小限のベーススタイル
-  components/                 コンポーネント
-  data/masters.ts             学校・学年・クラスのマスタ（絞り込みの選択肢）
-  data/students.ts            児童生徒データ（架空・40件）
-  router/index.ts             ルーティング
-  views/                      ページ
+  api/schoolApi.ts             getSchools() / getGrades(schoolIds) / getClasses(schoolIds, gradeId)
+  api/studentApi.ts            getStudents()
+  assets/styles/tokens.css     デザイントークン（色・余白・角丸・影）
+  assets/main.css              トークンの読み込みと最小限のベーススタイル
+  components/AppHeader.vue     共通ヘッダー
+  constants/grades.ts          学年の表示名マスタ（GRADES）
+  constants/classes.ts         組の表示名マスタ（CLASSES）
+  data/schools.ts              学校3件
+  data/schoolGrades.ts         学校に設置されている学年（15件）
+  data/schoolGradeClasses.ts   学校の学年ごとのクラス編成（35件）
+  data/students.ts             児童生徒40件（架空データ）
+  router/index.ts              ルーティング
+  types/                       common.ts / school.ts / student.ts
+  views/HomeView.vue           トップページ
 ```
+
+データの取得は `src/api/` の関数を通す。画面から `src/data/` を直接 import しない。
+学年・組の選択肢は `getGrades(schoolIds)` / `getClasses(schoolIds, gradeId)` が返す。
+在籍している児童生徒ではなく、学校に設置されている学年・クラス編成から決まる。
 
 ## スタイルの決まり
 
