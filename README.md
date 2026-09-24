@@ -38,8 +38,8 @@ yarn install
 ```
 .github/workflows/deploy.yml   main へのpushでビルドしGitHub Pagesへ公開
 src/
-  api/schoolApi.ts             getSchools()   学校の取得
-  api/studentApi.ts            getStudents()  児童生徒の取得
+  api/schoolApi.ts             getSchools() / getGrades() / getClasses()
+  api/studentApi.ts            getStudents()
   assets/styles/tokens.css     デザイントークン（色・余白・角丸・影）
   assets/main.css              トークンの読み込みと最小限のベーススタイル
   components/AppHeader.vue     共通ヘッダー
@@ -50,7 +50,9 @@ src/
   constants/classes.ts         組の選択肢（固定値）
   constants/grades.ts          学年の選択肢（固定値）
   constants/sort.ts            並び替えキーの選択肢
-  data/schools.ts              学校3件（サーバーから取得する想定のデータ）
+  data/schools.ts              学校3件
+  data/schoolGrades.ts         学校に設置されている学年（15件）
+  data/schoolGradeClasses.ts   学校の学年ごとのクラス編成（35件）
   data/students.ts             児童生徒40件（架空データ）
   router/index.ts              ルーティング
   types/                       common.ts / school.ts / student.ts / filter.ts
@@ -83,6 +85,7 @@ main にマージされると `.github/workflows/deploy.yml` が動き、ビル�
 検索ページでできること。
 
 - **絞り込み**：学校（複数選択）／学年／組／フリーワード（氏名・ふりがなの部分一致）／要フォローのみ表示。条件どうしはANDで、学校の複数選択だけ選んだ中でORになる。未選択・未入力・OFFの条件は絞り込みに使わない
+- **連動する選択肢**：学年の候補は選んだ学校に設置されている学年、組の候補はその学校・学年に編成されている組に絞られる。学校を複数選んだときは和集合
 - **並び替え**：ふりがな／学年／更新日の3キー × 昇順・降順
 - **件数表示**：「該当 N 件 ・ 全 M 件」
 - **空状態**：該当0件のときはテーブルごと消し、条件を変える案内を出す
@@ -93,6 +96,12 @@ main にマージされると `.github/workflows/deploy.yml` が動き、ビル�
 **データの入手経路を画面から隠した。**
 `src/api/` に `getStudents()` / `getSchools()` を置き、コンポーネントは `data/` を直接見ない。
 いまは配列を返すだけだが、実際の通信に差し替えるときは関数の中だけを変えればよく、呼び出し側の変更は `await` が付く程度で済む。
+
+**選択肢の候補は、在籍者から逆引きしていない。**
+学年の候補は `schoolGrades`（学校に設置されている学年）、組の候補は `schoolGradeClasses`（学校の学年ごとのクラス編成）から決まる。
+一覧に出ている40人から学年名・組名を集める作りにすると、「在籍者がいない学年は選べない」という別物になってしまう。
+実際のAPI（`GET /api/v1/grades?school_id=…`）が答えているのは設置学年なので、データもその形で持たせた。
+桜台第一小学校の1年C組は在籍者ゼロだが、設置されているので候補に出る。
 
 **増減するものと、しないものを分けた。**
 学校は施設なので増減する想定で `api/`。学年（小学1年〜中学3年）と組（A〜C）は増減しない選択肢なので `constants/`。

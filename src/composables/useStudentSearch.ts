@@ -1,4 +1,5 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { getClasses, getGrades } from '@/api/schoolApi'
 import { getStudents } from '@/api/studentApi'
 import type { SortKey, SortOrder } from '@/constants/sort'
 import type { StudentFilters } from '@/types/filter'
@@ -96,6 +97,27 @@ export const useStudentSearch = () => {
     )
   })
 
+  /** 学年の選択肢。選択中の学校に設置されている学年（複数選択なら和集合） */
+  const availableGrades = computed(() => getGrades(filters.value.schoolIds))
+
+  /** 組の選択肢。選択中の学校に設置されている組 */
+  const availableClasses = computed(() => getClasses(filters.value.schoolIds, filters.value.gradeId))
+
+  // 選択肢から外れた値だけを解除する（候補に残っていれば選択は維持する）。
+  // 状態を書き換える副作用なので computed では書けず、watch を使う場面にあたる。
+  watch(availableGrades, (grades) => {
+    const { gradeId } = filters.value
+    if (gradeId !== null && !grades.some((grade) => grade.id === gradeId)) {
+      filters.value.gradeId = null
+    }
+  })
+  watch(availableClasses, (classes) => {
+    const { classId } = filters.value
+    if (classId !== null && !classes.some((classRoom) => classRoom.id === classId)) {
+      filters.value.classId = null
+    }
+  })
+
   /** 絞り込み条件だけを初期値に戻す（並び替えは保持する） */
   const clearFilters = () => {
     filters.value = emptyFilters()
@@ -106,6 +128,8 @@ export const useStudentSearch = () => {
     filters,
     sortKey,
     sortOrder,
+    availableGrades,
+    availableClasses,
     filteredStudents,
     sortedStudents,
     clearFilters,

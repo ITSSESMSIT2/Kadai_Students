@@ -3,8 +3,17 @@ import StudentFilter from '@/components/StudentFilter.vue'
 import StudentList from '@/components/StudentList.vue'
 import { useStudentSearch } from '@/composables/useStudentSearch'
 
-const { students, filters, sortKey, sortOrder, filteredStudents, sortedStudents, clearFilters } =
-  useStudentSearch()
+const {
+  students,
+  filters,
+  sortKey,
+  sortOrder,
+  availableGrades,
+  availableClasses,
+  filteredStudents,
+  sortedStudents,
+  clearFilters,
+} = useStudentSearch()
 </script>
 
 <template>
@@ -13,6 +22,8 @@ const { students, filters, sortKey, sortOrder, filteredStudents, sortedStudents,
       v-model="filters"
       v-model:sort-key="sortKey"
       v-model:sort-order="sortOrder"
+      :available-grades="availableGrades"
+      :available-classes="availableClasses"
       @clear="clearFilters"
     />
 

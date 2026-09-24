@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { getSchools } from '@/api/schoolApi'
-import { CLASSES } from '@/constants/classes'
-import { GRADES } from '@/constants/grades'
 import { SORT_KEYS, type SortKey, type SortOrder } from '@/constants/sort'
 import type { StudentFilters } from '@/types/filter'
+import type { Grade, SchoolClass } from '@/types/school'
+
+defineProps<{
+  /** 選択中の学校に実在する学年だけを渡す */
+  availableGrades: Grade[]
+  /** 選択中の学校・学年に実在する組だけを渡す */
+  availableClasses: SchoolClass[]
+}>()
 
 const schools = getSchools()
 
@@ -37,7 +43,7 @@ const toggleOrder = () => {
         <label for="filter-grade">学年</label>
         <select id="filter-grade" v-model="filters.gradeId">
           <option :value="null">すべて</option>
-          <option v-for="grade in GRADES" :key="grade.id" :value="grade.id">
+          <option v-for="grade in availableGrades" :key="grade.id" :value="grade.id">
             {{ grade.name }}
           </option>
         </select>
@@ -47,7 +53,7 @@ const toggleOrder = () => {
         <label for="filter-class">組</label>
         <select id="filter-class" v-model="filters.classId">
           <option :value="null">すべて</option>
-          <option v-for="classRoom in CLASSES" :key="classRoom.id" :value="classRoom.id">
+          <option v-for="classRoom in availableClasses" :key="classRoom.id" :value="classRoom.id">
             {{ classRoom.name }}
           </option>
         </select>
